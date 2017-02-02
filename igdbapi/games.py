@@ -10,7 +10,7 @@ class Games(APIObject):
         params = {
             'fields': fields
         }
-        return APIClient().call(command='games/{id}'.format(id=id), params=params).single_result()
+        return APIClient().call(command='games/{id}'.format(id=id), params=params).as_single_result()
 
     def search(self, search, filters=None, fields='*', limit=10, offset=0, order=None):
         if type(fields) is list:
@@ -31,8 +31,8 @@ class Games(APIObject):
             else:
                 params.update(filters.to_param())
 
-        return APIClient().call(command='games/', params=params).collection_result()
+        return APIClient().call(command='games/', params=params).as_collection()
 
     def meta(self):
-        return APIClient().call(command='games/meta', params={}).collection_result()
+        return APIClient().call(command='games/meta', params={}).as_collection()
 

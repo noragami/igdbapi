@@ -14,7 +14,6 @@ from . import errors
 from .decorators import Singleton
 
 V1_ENDPOINT = "https://igdbcom-internet-game-database-v1.p.mashape.com/"
-VALID_RESOURCES = ['games', 'companies', 'people', 'franchises', 'platforms']
 
 
 @Singleton
@@ -24,31 +23,16 @@ class APIClient(object):
         self._api_key = api_key
         self._command = None
         self._headers = {'Accept': 'application/json; charset=UTF-8', 'X-Mashape-Key': self._api_key}
-
         if api_key is None:
             raise ValueError('You must set an API key.')
 
     def call(self, command, params):
-
         self._command = command
-
-        print('command is ' + command)
-
-        # if command not in VALID_RESOURCES:
-        #    raise ValueError('API command {command} is not valid.'.format(command=command))
-
         base_url = str(self)
-
         response = requests.request('GET', base_url,
                                     params=params,
                                     headers=self._headers, allow_redirects=False)
-
-        print(response.url, response.status_code)
-        # print(response.status_code)
-        # print(response.json())
-
         errors.check(response)
-
         return APIResponse(response.text)
 
     @property
@@ -73,7 +57,7 @@ class APIResponse(object):
         # Parse JSON into an object with attributes corresponding to dict keys.
         self._response = response
 
-    def single_result(self):
+    def as_single_result(self):
         if type(self.json_response()) == list:
             if len(self.json_response()) == 1:
                 return self.json_response()[0]
@@ -81,7 +65,7 @@ class APIResponse(object):
                 raise errors.APIError('Expected single result, found {results}'.format(results=len(self._response)))
         return self.json_response()
 
-    def collection_result(self):
+    def as_collection(self):
         return self.json_response()
 
     @staticmethod
@@ -132,26 +116,6 @@ class Filter(namedtuple('filter', 'key, postfix, value')):
     def to_param(self):
         return {'filter[{}][{}]'.format(self.key, str(self.postfix)): self.value}
 
-"""
-class Filter(object):
-
-    def __init__(self, key, value, postfix=FilterPostFix.Equal):
-        self._key = key
-        self._postfix = postfix
-        self._value = value
-
-    @property
-    def key(self):
-        return self._key
-
-    @property
-    def postfix(self):
-        return str(self._postfix)
-
-    @property
-    def value(self):
-        return self._value
-"""
 
 class APIObject(object):
     """
@@ -172,7 +136,7 @@ class APIObject(object):
 
     def __eq__(self, other):
         """
-        :type other: SteamObject
+        :type other: APIObject
         """
         # Use a "hash" of each object to prevent cases where derivative classes sharing the
         # same ID, like a user and an app, would cause a match if compared using ".id".
@@ -180,7 +144,7 @@ class APIObject(object):
 
     def __ne__(self, other):
         """
-        :type other: SteamObject
+        :type other: APIObject
         """
         return not self == other
 
