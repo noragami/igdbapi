@@ -4,24 +4,20 @@
 from setuptools import setup
 
 
-def local_requirements():
-    req_list = []
-    with open('requirements.txt') as requirements_file:
-        req_list = [line.strip() for line in requirements_file.readlines()]
-    install_reqs = list(filter(None, req_list))
-    return install_reqs
+with open('requirements.txt') as requirements_file:
+    requirements = requirements_file.read().splitlines()
 
 
 setup(name='igdbapi',
-      version='0.1',
+      version='0.2',
       description='An object-oriented Python 2.7+ library for accessing the Igdb API',
       url='https://github.com/noragami/igdbapi',
       author='noragami',
       author_email='yuumeikai@gmail.com',
       license='MIT',
       packages=['igdbapi'],
-      download_url='https://github.com/noragami/igdbapi/tarball/0.1',
+      download_url='https://github.com/noragami/igdbapi/tarball/0.2',
       keywords=['igdb', 'api', 'games'],
       classifiers=[],
-      install_requires=local_requirements(),
+      install_requires=requirements,
       zip_safe=False)
